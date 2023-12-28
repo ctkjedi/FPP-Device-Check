@@ -1,17 +1,23 @@
-#!/usr/bin/python3
+print("Starting test")
 
 import subprocess
 import time
 import smtplib
+import requests
 import json
 
-f = open("../config/co-universes.json")
-data = json.load(f)
 deviceList = []
-for i in data['channelOutputs']:
-    for j in i['universes']:
-        if j['active']==1:
-            deviceList.append(j['address'])
+
+def getIPs():
+    f = open("/home/fpp/media/config/co-universes.json","r")
+    data = json.load(f)
+    for i in data['channelOutputs']:
+        for j in i['universes']:
+            #print(j['address'])
+            if j['active']==1:
+                #print(j['address'])
+                deviceList.append(j['address'])
+    f.close()
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -57,20 +63,21 @@ def ping(site):
 
 
 def checkDevices():
+    print("Checking...")
     fail = 0
     list = ""
+    getIPs()
     for x in deviceList:
         success = ping(x)
         if success == 1:
-            print (x+" Device Up")		# for debug
-
+            print (x+" Device Up")             # for debug
         else:
-            print (x+" Device Not Responding")		# for debug
+            print (x+" Device Not Responding")           # for debug
             list += x+"\r"
             fail += 1
 
     if fail>0:
-        print("sending email")		#for debug
+        print("Sending email")		#for debug
         email(list)
 
 checkDevices()
