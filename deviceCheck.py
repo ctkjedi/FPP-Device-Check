@@ -7,6 +7,7 @@ import requests
 import json
 
 deviceList = []
+nameList = []
 
 def getIPs():
     f = open("/home/fpp/media/config/co-universes.json","r")
@@ -17,6 +18,7 @@ def getIPs():
             if j['active']==1:
                 #print(j['address'])
                 deviceList.append(j['address'])
+                nameList.append(j['description'])
     f.close()
 
 from email.mime.text import MIMEText
@@ -65,6 +67,7 @@ def ping(site):
 def checkDevices():
     print("Checking...")
     fail = 0
+    count = 0
     list = ""
     getIPs()
     for x in deviceList:
@@ -73,9 +76,9 @@ def checkDevices():
             print (x+" Device Up")             # for debug
         else:
             print (x+" Device Not Responding")           # for debug
-            list += x+"\r"
+            list += nameList[count]+" "+x+"\r"
             fail += 1
-
+        count +=1
     if fail>0:
         print("Sending email")		#for debug
         email(list)
